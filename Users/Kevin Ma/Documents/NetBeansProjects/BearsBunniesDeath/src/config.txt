@@ -1,0 +1,31 @@
+//BearsBunniesDeath Config File
+
+//Use this file to store configuration variables for all class files
+
+//THIS FILE SHOULD PLACED IN WORKING DIRECTORY OF THE PROJECT
+
+//General options
+
+myProjPathVar=\\build\\classes\\trunk\\
+
+bmpPathVar=Bitmaps\\
+
+
+//Map options
+
+debug=0
+
+x=25
+
+y=25
+
+no_terrain=true
+
+river=false
+
+houses=4
+
+obstacles=10
+
+
+
