@@ -133,21 +133,59 @@ public class ClsGrid extends JPanel implements KeyListener {
     }
 
     public ClsGrid() {
-        LoadConfig();
-        InitSquares();
-        BuildTerrain();
-        BuildCharacters(NUM_OF_BUNNIES, NUM_OF_BEARS);
+        int retryAttempts = 0;
+        int maxRetries = 3;
+        while(true) {
+            try {
+                LoadConfig();
+                InitSquares();
+                BuildTerrain();
+                BuildCharacters(NUM_OF_BUNNIES, NUM_OF_BEARS);
 
-        AddItems();
+                AddItems();
 
-        UpdateDarkness(DARKNESS_RADIUS, null);
+                UpdateDarkness(DARKNESS_RADIUS, null);
 
-        if (mylightsOn) {
-            LightEntireMap();
+                if (mylightsOn) {
+                    LightEntireMap();
+                }
+
+                setFocusable(true);
+                addKeyListener(this);
+                break;
+            } catch (Exception e) {
+                System.err.println("An error occured while initializing the game");
+                System.err.println("Attempt " + Integer.toString(++retryAttempts) + " of " + Integer.toString(maxRetries));
+                if (retryAttempts == maxRetries) {
+                    throw e;
+                }               
+            }
         }
-
-        setFocusable(true);
-        addKeyListener(this);
+    }
+    
+    public void ResetGame() {
+        int retryAttempts = 0;
+        int maxRetries = 3;
+        while (true) {
+            try {
+                gameOver = false;
+                titleScreen = true;
+                movesMade = 0;
+                mySideBar.PaintLoadingString(this.getGraphics(), "Rebuilding map...");
+                InitSquares();
+                BuildTerrain();
+                AddItems();
+                BuildCharacters(NUM_OF_BUNNIES, NUM_OF_BEARS);
+                UpdateDarkness(DARKNESS_RADIUS, null);
+                break;
+            } catch (Exception e){             
+                System.err.println("An error occured while resetting the game");
+                System.err.println("Attempt " + Integer.toString(++retryAttempts) + " of " + Integer.toString(maxRetries));
+                if (retryAttempts == maxRetries) {
+                    throw e;
+                }
+            }
+        }
     }
 
     @Override
@@ -308,7 +346,7 @@ public class ClsGrid extends JPanel implements KeyListener {
         rect = new Rectangle2D.Double(PAD + coord.x * SQUARELEN, PAD + coord.y * SQUARELEN, SQUARELEN, SQUARELEN);
         this.myUserChar = new ClsUserCharacter(coord, rect, null, this); //?Matt? USER SPAWNING
 
-        //Build bunnies and bears      
+        //Build bunnies and bears              
         ClsBunny[] bunnies = new ClsBunny[numberOfBunnies];
         boolean canBunnyReachUser;
         for (int i = 0; i < numberOfBunnies; i++) {
@@ -321,8 +359,8 @@ public class ClsGrid extends JPanel implements KeyListener {
                 canBunnyReachUser = navigator.IsRouteAvailable(this.myUserChar.GetCoord(), coord);
             } while (!canBunnyReachUser);
         }
-        this.myBunnies = bunnies;
-
+        this.myBunnies = bunnies;                   
+                 
         ClsBear[] bears = new ClsBear[numberOfBears];
         walkCoord = this.GetCoordinates(eTerrain.WALKABLE);
         coord = null;
@@ -1238,15 +1276,7 @@ public class ClsGrid extends JPanel implements KeyListener {
 
         } else if (gameOver == true) {
             if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                gameOver = false;
-                titleScreen = true;
-                movesMade = 0;
-                mySideBar.PaintLoadingString(this.getGraphics(), "Rebuilding map...");
-                InitSquares();
-                BuildTerrain();
-                AddItems();
-                BuildCharacters(NUM_OF_BUNNIES, NUM_OF_BEARS);
-                UpdateDarkness(DARKNESS_RADIUS, null);
+                  this.ResetGame();
             }
         }
 
