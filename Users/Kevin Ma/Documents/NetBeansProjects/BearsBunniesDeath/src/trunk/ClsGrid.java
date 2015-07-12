@@ -725,8 +725,17 @@ public class ClsGrid extends JPanel implements KeyListener {
             }
 
             if (IsCoordinateInArray(this.myUserChar.GetCoord(), stairsCoords) > -1) {
+                this.AlertBearsOfStairs(this.myUserChar.GetCoord());
                 stairsCoords = RemoveCoordFromArray(stairsCoords, this.myUserChar.GetCoord());
                 this.myUserChar.Move(stairsCoords[RandomNumber(stairsCoords.length)]);
+            }
+            
+            for (ClsBear bear : this.myBears) {
+                if (IsCoordinateInArray(bear.GetCoord(), stairsCoords) > -1) {
+                    stairsCoords = RemoveCoordFromArray(stairsCoords, bear.GetCoord());
+                    bear.Move(stairsCoords[RandomNumber(stairsCoords.length)]);
+                    bear.ClearCoordLock();
+                }
             }
         }
     }
@@ -795,6 +804,16 @@ public class ClsGrid extends JPanel implements KeyListener {
             }
         }
 //        }
+    }
+    
+    private void AlertBearsOfStairs(ClsCoordinate stairs) {
+        double distanceFromStairs;
+        for (ClsBear bear : this.myBears) {
+            distanceFromStairs = Point2D.distance(bear.GetX(), bear.GetY(), stairs.x, stairs.y);
+            if (distanceFromStairs < bear.BEAR_STAIRS_LOCK_RADIUS) {
+                bear.SetCoordLock(stairs);               
+            }
+        }
     }
 
     private void HandleItemsOnNewSquare() {
