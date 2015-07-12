@@ -19,14 +19,16 @@ public class ClsBear extends ClsCharacter {
 //    private ClsGrid myGrid;
     public final double BEAR_RANDOM_RADIUS = 25;
     public final double BEAR_FOLLOW_ROUTE_RADIUS = 5;
+    public final double BEAR_STAIRS_LOCK_RADIUS = 5;
     public final double BUNNY_CHASE_RADIUS = 2.1;
     private final ClsGrid myGrid;
 
     private ClsNavigator myNavigator;
     private ClsCoordinate[] currentPath;
     private int myCurrentRouteIndex = 0;
-    private ClsCharacter myTarget;
+    private ClsCoordinate myTarget;
     private boolean myIsStopped = false;
+    private ClsCoordinate coordLock = null;
 //    private BearBehaviour myBehaviour = BearBehaviour.eRandomMovement;
 
 //    private enum BearBehaviour{
@@ -46,9 +48,9 @@ public class ClsBear extends ClsCharacter {
         }
 
         //TODO: Fix this hack!!
-        if (Point2D.distance(this.GetX(), this.GetY(), myGrid.GetMyUserChar().GetX(), myGrid.GetMyUserChar().GetY()) < 1.1){
-            return myGrid.GetMyUserChar().GetCoord();
-        }
+     //   if (Point2D.distance(this.GetX(), this.GetY(), myGrid.GetMyUserChar().GetX(), myGrid.GetMyUserChar().GetY()) < 1.1){
+     //       return myGrid.GetMyUserChar().GetCoord();
+     //   }
         
 //        if ( myTarget.IsDead()) {
         myTarget = DetermineTarget();
@@ -59,7 +61,7 @@ public class ClsBear extends ClsCharacter {
             return this.GetCoord().Move(ClsGrid.eDirection.RANDOM);
         }
 
-        ClsCoordinate[] chasePath = myNavigator.GetShortestPath(this.GetCoord(), myTarget.GetCoord());
+        ClsCoordinate[] chasePath = myNavigator.GetShortestPath(this.GetCoord(), myTarget);
 //        myNavigator.IsRouteAvailable(this.GetCoord(), myTarget.GetCoord());
         
         //TODO:MOVEMENT ERROR nullpointer exception
@@ -116,7 +118,7 @@ public class ClsBear extends ClsCharacter {
         return null;
     }
 
-    private ClsCharacter DetermineTarget() {
+    private ClsCoordinate DetermineTarget() {
 
         ClsCharacter returnSquare;
 
@@ -125,16 +127,20 @@ public class ClsBear extends ClsCharacter {
         if (!(returnSquare == null)) {
 //            if (this.myNavigator.IsRouteAvailable(this.GetCoord(), returnSquare.GetCoord())) {
 //            System.out.print("Bear: bunny");
-            return returnSquare;
+            return returnSquare.GetCoord();
 //            }
+        }
+        
+        if (!(coordLock == null)) {
+            return coordLock;
         }
 
         double distanceFromUser = Point2D.distance(this.GetX(), this.GetY(), myGrid.GetMyUserChar().GetX(), myGrid.GetMyUserChar().GetY());
-
+           
         if (distanceFromUser < BEAR_RANDOM_RADIUS) {
 //            System.out.print("Bear: User");
-            return myGrid.GetMyUserChar();
-        }
+            return myGrid.GetMyUserChar().GetCoord();
+        }           
 
         return null;
     }
@@ -145,6 +151,18 @@ public class ClsBear extends ClsCharacter {
 
     public void SetIsStopped(boolean myIsEating) {
         this.myIsStopped = myIsEating;
+    }
+    
+    public ClsCoordinate GetCoordLock() {
+        return coordLock;
+    }
+    
+    public void SetCoordLock(ClsCoordinate lock) {
+        this.coordLock = lock;
+    }
+    
+    public void ClearCoordLock() {
+        this.coordLock = null;
     }
 
 }
