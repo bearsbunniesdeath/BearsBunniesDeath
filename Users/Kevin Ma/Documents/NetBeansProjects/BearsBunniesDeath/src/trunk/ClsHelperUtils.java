@@ -43,6 +43,19 @@ public class ClsHelperUtils {
             NUM_OF_BUNNIES = Integer.parseInt(GetConfigVar("bunnies", Integer.toString(NUM_OF_BUNNIES)));
             NUM_OF_BEARS = Integer.parseInt(GetConfigVar("bears", Integer.toString(NUM_OF_BEARS)));
             BUILD_RIVER = Boolean.parseBoolean(GetConfigVar("river", Boolean.toString(BUILD_RIVER)));
+        } else {  //Load from the difficulty
+            String prefix = "";
+            if (DIFFICULTY.equals(eDifficulty.EASY)) {
+                prefix = "easy_";
+            } else if (DIFFICULTY.equals(eDifficulty.NORMAL)) {
+                prefix = "norm_";
+            } else if (DIFFICULTY.equals(eDifficulty.HARD)) {
+                prefix = "hard_";
+            }
+            NUMOFX = Integer.parseInt(GetConfigVar(prefix.concat("x"), Integer.toString(NUMOFX)));
+            NUMOFY = Integer.parseInt(GetConfigVar(prefix.concat("y"), Integer.toString(NUMOFY)));
+            NUM_OF_BUNNIES = Integer.parseInt(GetConfigVar(prefix.concat("bunnies"), Integer.toString(NUM_OF_BUNNIES)));
+            NUM_OF_BEARS = Integer.parseInt(GetConfigVar(prefix.concat("bears"), Integer.toString(NUM_OF_BEARS)));            
         }
     }
 
