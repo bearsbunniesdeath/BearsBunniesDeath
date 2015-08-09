@@ -32,8 +32,8 @@ public class ClsGrid extends JPanel implements KeyListener {
     public static final int DARKNESS_RADIUS = 3;
     public static int NUM_OF_BUNNIES = 25;
     public static int NUM_OF_BEARS = 3;
-    public static final int NUM_OF_FLARES = 5;
-    public static final int NUM_OF_BEAR_TRAPS = 5;
+    public static final int NUM_OF_FLARES = 15;
+    public static final int NUM_OF_BEAR_TRAPS = 15;
 
     public double BEAR_USER_SPAWN_DISTANCE = 5.0;
     public boolean mylightsOn = false;
@@ -310,16 +310,25 @@ public class ClsGrid extends JPanel implements KeyListener {
 
         //Build bunnies and bears      
         ClsBunny[] bunnies = new ClsBunny[numberOfBunnies];
-        boolean canBunnyReachUser;
+        boolean validBunnyLocation;
         for (int i = 0; i < numberOfBunnies; i++) {
             do {
                 coord = walkCoord[RandomNumber(walkCoord.length)];
-                walkCoord = RemoveCoordFromArray(walkCoord, coord);
-                rect = new Rectangle2D.Double(PAD + coord.x * SQUARELEN, PAD + coord.y * SQUARELEN, SQUARELEN, SQUARELEN);
-                bunnies[i] = new ClsBunny(new ClsCoordinate(coord.x, coord.y), rect, null, this);
+
                 ClsNavigator navigator = new ClsNavigator(this);
-                canBunnyReachUser = navigator.IsRouteAvailable(this.myUserChar.GetCoord(), coord);
-            } while (!canBunnyReachUser);
+                validBunnyLocation = navigator.IsRouteAvailable(this.myUserChar.GetCoord(), coord);
+
+                for (ClsHouse currHouse : myHouses) {
+                    if (currHouse.getMyStairsCoord().Equals(coord)) {
+                        validBunnyLocation = false;
+                    }
+                }
+
+            } while (!validBunnyLocation);
+
+            walkCoord = RemoveCoordFromArray(walkCoord, coord);
+            rect = new Rectangle2D.Double(PAD + coord.x * SQUARELEN, PAD + coord.y * SQUARELEN, SQUARELEN, SQUARELEN);
+            bunnies[i] = new ClsBunny(new ClsCoordinate(coord.x, coord.y), rect, null, this);
         }
         this.myBunnies = bunnies;
 
@@ -356,11 +365,21 @@ public class ClsGrid extends JPanel implements KeyListener {
         ClsCoordinate[] walkCoord = this.GetCoordinates(eTerrain.WALKABLE);
         ClsCoordinate coord;
         for (int i = 0; i < numberOfFlares; i++) {
-            coord = walkCoord[RandomNumber(walkCoord.length)];
-            walkCoord = RemoveCoordFromArray(walkCoord, coord);
+            boolean validFlareLocation;
+            do {
+                validFlareLocation = true;
+                coord = walkCoord[RandomNumber(walkCoord.length)];
 
+                for (ClsHouse currHouse : myHouses) {
+                    if (currHouse.getMyStairsCoord().Equals(coord)) {
+                        validFlareLocation = false;
+                    }
+                }
+            } while (!validFlareLocation);
+            walkCoord = RemoveCoordFromArray(walkCoord, coord);
             rect = new Rectangle2D.Double(PAD + coord.x * SQUARELEN, PAD + coord.y * SQUARELEN, SQUARELEN, SQUARELEN);
             flares[i] = new ClsFlare(new ClsCoordinate(coord.x, coord.y), rect, null, this);
+
         }
         this.myFlares = flares;
     }
@@ -373,11 +392,21 @@ public class ClsGrid extends JPanel implements KeyListener {
         ClsCoordinate[] walkCoord = this.GetCoordinates(eTerrain.WALKABLE);
         ClsCoordinate coord;
         for (int i = 0; i < numberOfBearTraps; i++) {
-            coord = walkCoord[RandomNumber(walkCoord.length)];
-            walkCoord = RemoveCoordFromArray(walkCoord, coord);
+            boolean validTrapLocation;
+            do {
+                validTrapLocation = true;
+                coord = walkCoord[RandomNumber(walkCoord.length)];
 
+                for (ClsHouse currHouse : myHouses) {
+                    if (currHouse.getMyStairsCoord().Equals(coord)) {
+                        validTrapLocation = false;
+                    }
+                }
+            } while (!validTrapLocation);
+            walkCoord = RemoveCoordFromArray(walkCoord, coord);
             rect = new Rectangle2D.Double(PAD + coord.x * SQUARELEN, PAD + coord.y * SQUARELEN, SQUARELEN, SQUARELEN);
             bearTraps[i] = new ClsBearTrap(new ClsCoordinate(coord.x, coord.y), rect, null, this);
+
         }
         this.myBearTraps = bearTraps;
     }
@@ -729,7 +758,7 @@ public class ClsGrid extends JPanel implements KeyListener {
                 stairsCoords = RemoveCoordFromArray(stairsCoords, this.myUserChar.GetCoord());
                 this.myUserChar.Move(stairsCoords[RandomNumber(stairsCoords.length)]);
             }
-            
+
             for (ClsBear bear : this.myBears) {
                 if (IsCoordinateInArray(bear.GetCoord(), stairsCoords) > -1) {
                     stairsCoords = RemoveCoordFromArray(stairsCoords, bear.GetCoord());
@@ -805,13 +834,13 @@ public class ClsGrid extends JPanel implements KeyListener {
         }
 //        }
     }
-    
+
     private void AlertBearsOfStairs(ClsCoordinate stairs) {
         double distanceFromStairs;
         for (ClsBear bear : this.myBears) {
             distanceFromStairs = Point2D.distance(bear.GetX(), bear.GetY(), stairs.x, stairs.y);
             if (distanceFromStairs < bear.BEAR_STAIRS_LOCK_RADIUS) {
-                bear.SetCoordLock(stairs);               
+                bear.SetCoordLock(stairs);
             }
         }
     }
@@ -1174,7 +1203,7 @@ public class ClsGrid extends JPanel implements KeyListener {
     public void SetBearTraps(ClsBearTrap[] myBearTraps) {
         this.myBearTraps = myBearTraps;
     }
-    
+
     public ClsCoordinate[] GetAllStairsCoord() {
         ClsCoordinate[] stairsCoords = new ClsCoordinate[0];
         for (ClsHouse house : this.myHouses) {

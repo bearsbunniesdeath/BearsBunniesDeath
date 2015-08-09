@@ -60,6 +60,12 @@ public class ClsHelperUtils {
 //	}
     public static ClsCoordinate[] RemoveCoordFromArray(ClsCoordinate[] input, ClsCoordinate deleteMe) {
 //        List result = new LinkedList();
+        
+//        TEMP for debugging
+        if (input.length < 1) {
+            System.err.println("");
+        }
+        
         ClsCoordinate[] result = new ClsCoordinate[input.length - 1];
         int index = 0;
 

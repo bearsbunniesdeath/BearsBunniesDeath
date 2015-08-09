@@ -115,7 +115,9 @@ public class ClsUserCharacter extends ClsCharacter {
         } else if (choice == ClsGrid.BUNNY_FLARE_INDEX) {
             ClsBunny torchBunny = ConstructAndReturnBunnyFlare(potentialItems);
             myItem = torchBunny;
-            myGrid.RemoveBunnyFromGrid(myPotentialBunny);
+            if (myPotentialBunny == null) {
+                myGrid.RemoveBunnyFromGrid(myPotentialBunny);
+            }
         } else if (choice == ClsGrid.BEARTRAP_FLARE_INDEX) {
             //TODO: Decide which items to destroy / leave / set & drop
         } else if (choice == ClsGrid.BEARTRAP_BUNNY_INDEX) {
