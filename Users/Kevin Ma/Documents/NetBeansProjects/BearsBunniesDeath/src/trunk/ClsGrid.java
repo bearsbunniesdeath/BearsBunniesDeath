@@ -72,6 +72,7 @@ public class ClsGrid extends JPanel implements KeyListener {
 
     private int movesMade = 0;
     private int highScore = 0;
+    public static eDifficulty DIFFICULTY = eDifficulty.NORMAL;
 
     private boolean titleScreen = true;
     private boolean playing = false;
@@ -82,6 +83,10 @@ public class ClsGrid extends JPanel implements KeyListener {
 
         }
 
+    }
+    
+    public static enum eDifficulty {
+        EASY, NORMAL, HARD
     }
 
     public static enum eDirection {
@@ -168,15 +173,19 @@ public class ClsGrid extends JPanel implements KeyListener {
         int maxRetries = 3;
         while (true) {
             try {
-                gameOver = false;
-                titleScreen = true;
+                titleScreen = false;
+                playing = true;
                 movesMade = 0;
                 mySideBar.PaintLoadingString(this.getGraphics(), "Rebuilding map...");
+                LoadConfig();
                 InitSquares();
                 BuildTerrain();
                 AddItems();
                 BuildCharacters(NUM_OF_BUNNIES, NUM_OF_BEARS);
                 UpdateDarkness(DARKNESS_RADIUS, null);
+                if (mylightsOn) {
+                    LightEntireMap();
+                }
                 break;
             } catch (Exception e){             
                 System.err.println("An error occured while resetting the game");
@@ -211,7 +220,10 @@ public class ClsGrid extends JPanel implements KeyListener {
 //        g.drawString("High score: " + Integer.toString(highScore), rightBorderOfPlayFieldInPixels, 475);
         if (titleScreen == true) {
             //Need to Move to UIDisplay
-            g.drawString("Press P to play.", 350, 350);
+            g.drawString("Press a number to select a difficulty level", 350, 250);
+            g.drawString("1 = Easy", 350, 300 );
+            g.drawString("2 = Normal", 350, 350);
+            g.drawString("3 = Hard", 350, 400);
 
         } else if (playing == true) {
             //Paint terrain
@@ -1225,10 +1237,22 @@ public class ClsGrid extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
 
-        if (titleScreen == true) {
-            if (e.getKeyCode() == KeyEvent.VK_P) {
+        if (titleScreen == true) {           
+            if (e.getKeyCode() == KeyEvent.VK_NUMPAD1 || e.getKeyCode() == KeyEvent.VK_1) {
                 titleScreen = false;
                 playing = true;
+                DIFFICULTY = eDifficulty.EASY;
+                ResetGame();
+            } else if (e.getKeyCode() == KeyEvent.VK_NUMPAD2 || e.getKeyCode() == KeyEvent.VK_2) {
+                titleScreen = false;
+                playing = true;
+                DIFFICULTY = eDifficulty.NORMAL;
+                ResetGame();  
+            } else if (e.getKeyCode() == KeyEvent.VK_NUMPAD3 || e.getKeyCode() == KeyEvent.VK_3) {
+                titleScreen = false;
+                playing = true;
+                DIFFICULTY = eDifficulty.HARD;
+                ResetGame();
             }
         } else if (playing == true) {
             if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
@@ -1276,7 +1300,8 @@ public class ClsGrid extends JPanel implements KeyListener {
 
         } else if (gameOver == true) {
             if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                  this.ResetGame();
+                gameOver = false;
+                titleScreen = true;
             }
         }
 
