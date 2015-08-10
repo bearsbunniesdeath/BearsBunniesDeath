@@ -132,6 +132,11 @@ public class ClsGrid extends JPanel implements KeyListener {
         USER_L, USER_R, USER_U, USER_D, BUNNY, BEAR, BUNNY_DEAD, BEAR_EATING_BUNNY, BLANK;
     }
 
+    public static enum eUIImage {
+
+        TRANSPARENT_BOX;
+    }
+
     public ClsGrid() {
         LoadConfig();
         InitSquares();
@@ -909,7 +914,7 @@ public class ClsGrid extends JPanel implements KeyListener {
         }
 
         ExpandPotentialPickUpsWithHybrids();
-        System.out.println(Arrays.toString(myPotentialPickups));
+//        System.out.println(Arrays.toString(myPotentialPickups));
 
         return retValue;
     }

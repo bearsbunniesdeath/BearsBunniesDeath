@@ -55,13 +55,16 @@ public class ClsUIDisplay {
     }
 
     public void PaintGameOverScore(Graphics g, Integer movesMade, Integer highScore) {
-        g.setColor(java.awt.Color.RED);
+//        g.fillRect(myFullWidth / 2, myBottomPosition/2 - 125, 350, 250);
+        g.drawImage(ClsImageUtil.GetImage(ClsGrid.eUIImage.TRANSPARENT_BOX), myFullWidth / 2, myBottomPosition / 2 - 125, null);
+
+        g.setColor(java.awt.Color.WHITE);
         g.setFont(new Font("TimesRoman", Font.BOLD, 18));
 
-        g.drawString("Number of moves: " + Integer.toString(movesMade), (myPanelLeftPosition / 2) - 75, (myWindowHeight / 2));
-        g.drawString("High score: " + Integer.toString(highScore), (myPanelLeftPosition / 2) - 75, (myWindowHeight / 2) + 25);
+        g.drawString("Number of moves: " + Integer.toString(movesMade), myFullWidth / 2 + 50, myBottomPosition / 2 - 25);
+        g.drawString("High score: " + Integer.toString(highScore), myFullWidth / 2 + 50, myBottomPosition / 2);
 
-        g.drawString("Press space to restart.", (myPanelLeftPosition / 2) - 75, (myWindowHeight / 2) + 50);
+        g.drawString("Press space to restart.", myFullWidth / 2 + 50, myBottomPosition / 2 + 50);
     }
 
     public void DrawSideBar(Boolean[] potentialItems, Integer numberOfItemsAvailible, ClsSquare userItem, ClsSquare userItemToUse, Graphics g, Integer currentScore, Integer highScore, boolean itemOptionAvailable) {
@@ -104,7 +107,7 @@ public class ClsUIDisplay {
                 g.drawImage(ClsImageUtil.GetImage(ClsGrid.eItemImage.BEARTRAP_FLARE), ITEM_2_X_POSITION + myPanelLeftPosition, ITEM_2_Y_POSITION + 40, null);
             }
             if (potentialItems[ClsGrid.BEARTRAP_BUNNY_INDEX]) {
-                g.drawImage(ClsImageUtil.GetImage(ClsGrid.eItemImage.BEARTRAP_BUNNY), ITEM_3_X_POSITION + myPanelLeftPosition, ITEM_3_Y_POSITION+ 40, null);
+                g.drawImage(ClsImageUtil.GetImage(ClsGrid.eItemImage.BEARTRAP_BUNNY), ITEM_3_X_POSITION + myPanelLeftPosition, ITEM_3_Y_POSITION + 40, null);
             }
 
             if (numberOfItemsAvailible > 1) {

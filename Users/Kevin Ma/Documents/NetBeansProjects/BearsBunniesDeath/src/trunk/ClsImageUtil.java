@@ -82,6 +82,8 @@ public class ClsImageUtil {
                 return ImageIO.read(cl.getResource("trunk/Bitmaps/darknessAlert.png"));
             } else if (imgName.equals(eItemImage.BLANK) || imgName.equals(eCharacterImage.BLANK)) {
                 return ImageIO.read(cl.getResource("trunk/Bitmaps/blankImage.png"));
+            } else if (imgName.equals(ClsGrid.eUIImage.TRANSPARENT_BOX)) {
+                return ImageIO.read(cl.getResource("trunk/Bitmaps/transparentBlackBox.png"));
             } else {
                 return ImageIO.read(cl.getResource("trunk/Bitmaps/missing.png"));
             }
