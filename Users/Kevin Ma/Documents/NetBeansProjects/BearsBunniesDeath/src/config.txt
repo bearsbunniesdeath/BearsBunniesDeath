@@ -1,17 +1,17 @@
-//BearsBunniesDeath Config File
+#BearsBunniesDeath Config File
 
-//Use this file to store configuration variables for all class files
+#Use this file to store configuration variables for all class files
 
-//THIS FILE SHOULD PLACED IN WORKING DIRECTORY OF THE PROJECT
+#THIS FILE SHOULD PLACED IN WORKING DIRECTORY OF THE PROJECT
 
-//General options
+#General options
 
 myProjPathVar=\\build\\classes\\trunk\\
 
 bmpPathVar=Bitmaps\\
 
 
-//Map options
+#Map options
 
 debug=0
 
@@ -26,6 +26,30 @@ river=false
 houses=4
 
 obstacles=10
+
+
+#Map difficulty settings
+
+#Easy
+
+easy_x=35
+easy_y=19
+easy_bears=5
+easy_bunnies=20
+
+#Normal
+
+norm_x=35
+norm_y=19
+norm_bears=15
+norm_bunnies=15
+
+#Hard
+
+hard_x=35
+hard_y=19
+hard_bears=20
+hard_bunnies=10
 
 
 

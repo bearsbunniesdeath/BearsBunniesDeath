@@ -72,6 +72,7 @@ public class ClsGrid extends JPanel implements KeyListener {
 
     private int movesMade = 0;
     private int highScore = 0;
+    public static eDifficulty DIFFICULTY = eDifficulty.NORMAL;
 
     private boolean titleScreen = true;
     private boolean playing = false;
@@ -82,6 +83,10 @@ public class ClsGrid extends JPanel implements KeyListener {
 
         }
 
+    }
+    
+    public static enum eDifficulty {
+        EASY, NORMAL, HARD
     }
 
     public static enum eDirection {
@@ -138,21 +143,63 @@ public class ClsGrid extends JPanel implements KeyListener {
     }
 
     public ClsGrid() {
-        LoadConfig();
-        InitSquares();
-        BuildTerrain();
-        BuildCharacters(NUM_OF_BUNNIES, NUM_OF_BEARS);
+        int retryAttempts = 0;
+        int maxRetries = 3;
+        while(true) {
+            try {
+                LoadConfig();
+                InitSquares();
+                BuildTerrain();
+                BuildCharacters(NUM_OF_BUNNIES, NUM_OF_BEARS);
 
-        AddItems();
+                AddItems();
 
-        UpdateDarkness(DARKNESS_RADIUS, null);
+                UpdateDarkness(DARKNESS_RADIUS, null);
 
-        if (mylightsOn) {
-            LightEntireMap();
+                if (mylightsOn) {
+                    LightEntireMap();
+                }
+
+                setFocusable(true);
+                addKeyListener(this);
+                break;
+            } catch (Exception e) {
+                System.err.println("An error occured while initializing the game");
+                System.err.println("Attempt " + Integer.toString(++retryAttempts) + " of " + Integer.toString(maxRetries));
+                if (retryAttempts == maxRetries) {
+                    throw e;
+                }               
+            }
         }
-
-        setFocusable(true);
-        addKeyListener(this);
+    }
+    
+    public void ResetGame() {
+        int retryAttempts = 0;
+        int maxRetries = 3;
+        while (true) {
+            try {
+                titleScreen = false;
+                playing = true;
+                movesMade = 0;
+                mySideBar.PaintLoadingString(this.getGraphics(), "Rebuilding map...");
+                LoadConfig();
+                InitSquares();
+                BuildTerrain();
+                AddItems();
+                BuildCharacters(NUM_OF_BUNNIES, NUM_OF_BEARS);
+                UpdateDarkness(DARKNESS_RADIUS, null);
+                if (mylightsOn) {
+                    LightEntireMap();
+                }
+                break;
+            } catch (Exception e){             
+                System.err.println("An error occured while resetting the game");
+                System.err.println("Attempt " + Integer.toString(++retryAttempts) + " of " + Integer.toString(maxRetries));
+                if (retryAttempts == maxRetries) {
+                    throw e;
+                }
+            }
+        }
     }
 
     @Override
@@ -178,7 +225,10 @@ public class ClsGrid extends JPanel implements KeyListener {
 //        g.drawString("High score: " + Integer.toString(highScore), rightBorderOfPlayFieldInPixels, 475);
         if (titleScreen == true) {
             //Need to Move to UIDisplay
-            g.drawString("Press P to play.", 350, 350);
+            g.drawString("Press a number to select a difficulty level", 350, 250);
+            g.drawString("1 = Easy", 350, 300 );
+            g.drawString("2 = Normal", 350, 350);
+            g.drawString("3 = Hard", 350, 400);
 
         } else if (playing == true) {
             //Paint terrain
@@ -313,7 +363,7 @@ public class ClsGrid extends JPanel implements KeyListener {
         rect = new Rectangle2D.Double(PAD + coord.x * SQUARELEN, PAD + coord.y * SQUARELEN, SQUARELEN, SQUARELEN);
         this.myUserChar = new ClsUserCharacter(coord, rect, null, this); //?Matt? USER SPAWNING
 
-        //Build bunnies and bears      
+        //Build bunnies and bears              
         ClsBunny[] bunnies = new ClsBunny[numberOfBunnies];
         boolean validBunnyLocation;
         for (int i = 0; i < numberOfBunnies; i++) {
@@ -335,8 +385,8 @@ public class ClsGrid extends JPanel implements KeyListener {
             rect = new Rectangle2D.Double(PAD + coord.x * SQUARELEN, PAD + coord.y * SQUARELEN, SQUARELEN, SQUARELEN);
             bunnies[i] = new ClsBunny(new ClsCoordinate(coord.x, coord.y), rect, null, this);
         }
-        this.myBunnies = bunnies;
-
+        this.myBunnies = bunnies;                   
+                 
         ClsBear[] bears = new ClsBear[numberOfBears];
         walkCoord = this.GetCoordinates(eTerrain.WALKABLE);
         coord = null;
@@ -1221,10 +1271,22 @@ public class ClsGrid extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
 
-        if (titleScreen == true) {
-            if (e.getKeyCode() == KeyEvent.VK_P) {
+        if (titleScreen == true) {           
+            if (e.getKeyCode() == KeyEvent.VK_NUMPAD1 || e.getKeyCode() == KeyEvent.VK_1) {
                 titleScreen = false;
                 playing = true;
+                DIFFICULTY = eDifficulty.EASY;
+                ResetGame();
+            } else if (e.getKeyCode() == KeyEvent.VK_NUMPAD2 || e.getKeyCode() == KeyEvent.VK_2) {
+                titleScreen = false;
+                playing = true;
+                DIFFICULTY = eDifficulty.NORMAL;
+                ResetGame();  
+            } else if (e.getKeyCode() == KeyEvent.VK_NUMPAD3 || e.getKeyCode() == KeyEvent.VK_3) {
+                titleScreen = false;
+                playing = true;
+                DIFFICULTY = eDifficulty.HARD;
+                ResetGame();
             }
         } else if (playing == true) {
             if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
@@ -1274,13 +1336,6 @@ public class ClsGrid extends JPanel implements KeyListener {
             if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                 gameOver = false;
                 titleScreen = true;
-                movesMade = 0;
-                mySideBar.PaintLoadingString(this.getGraphics(), "Rebuilding map...");
-                InitSquares();
-                BuildTerrain();
-                AddItems();
-                BuildCharacters(NUM_OF_BUNNIES, NUM_OF_BEARS);
-                UpdateDarkness(DARKNESS_RADIUS, null);
             }
         }
 
