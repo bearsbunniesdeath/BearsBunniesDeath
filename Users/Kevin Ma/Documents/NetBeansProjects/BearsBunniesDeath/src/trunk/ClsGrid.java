@@ -86,6 +86,7 @@ public class ClsGrid extends JPanel implements KeyListener {
     }
 
     public static enum eDifficulty {
+
         EASY, NORMAL, HARD
     }
 
@@ -190,8 +191,8 @@ public class ClsGrid extends JPanel implements KeyListener {
                 LoadConfig();
                 InitSquares();
                 BuildTerrain();
-                AddItems();
                 BuildCharacters(NUM_OF_BUNNIES, NUM_OF_BEARS);
+                AddItems();
                 UpdateDarkness(DARKNESS_RADIUS, null);
 
                 if (mylightsOn) {
@@ -465,11 +466,16 @@ public class ClsGrid extends JPanel implements KeyListener {
                 validFlareLocation = true;
                 coord = walkCoord[RandomNumber(walkCoord.length)];
 
+                if (myUserChar.GetCoord().Equals(coord)) {
+                    validFlareLocation = false;
+                }
+
                 for (ClsHouse currHouse : myHouses) {
                     if (currHouse.getMyStairsCoord().Equals(coord)) {
                         validFlareLocation = false;
                     }
                 }
+
             } while (!validFlareLocation);
             walkCoord = RemoveCoordFromArray(walkCoord, coord);
             rect = new Rectangle2D.Double(PAD + coord.x * SQUARELEN, PAD + coord.y * SQUARELEN, SQUARELEN, SQUARELEN);
@@ -491,6 +497,10 @@ public class ClsGrid extends JPanel implements KeyListener {
             do {
                 validTrapLocation = true;
                 coord = walkCoord[RandomNumber(walkCoord.length)];
+
+                if (myUserChar.GetCoord().Equals(coord)) {
+                    validTrapLocation = false;
+                }
 
                 for (ClsHouse currHouse : myHouses) {
                     if (currHouse.getMyStairsCoord().Equals(coord)) {
