@@ -17,7 +17,7 @@ import trunk.ClsGrid.eCharacterImage;
 public class ClsBear extends ClsCharacter {
 
 //    private ClsGrid myGrid;
-    public final double BEAR_RANDOM_RADIUS = 25;
+    public final double BEAR_RANDOM_RADIUS = 15;
     public final double BEAR_FOLLOW_ROUTE_RADIUS = 5;
     public final double BEAR_STAIRS_LOCK_RADIUS = 5;
     public final double BUNNY_CHASE_RADIUS = 2.1;

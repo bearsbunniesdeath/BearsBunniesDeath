@@ -28,7 +28,7 @@ public class ClsGrid extends JPanel implements KeyListener {
     public static int MAX_NUM_OF_HOUSES = 4;
     public boolean quadrantHouseSpawn = true;   //Will override max num of house to 4
 
-    public static int MAX_NUM_OF_OBSTACLES = 150;
+    public static int MAX_NUM_OF_OBSTACLES = 100;
     public static final int DARKNESS_RADIUS = 3;
     public static int NUM_OF_BUNNIES = 25;
     public static int NUM_OF_BEARS = 3;
@@ -84,7 +84,7 @@ public class ClsGrid extends JPanel implements KeyListener {
         }
 
     }
-    
+
     public static enum eDifficulty {
         EASY, NORMAL, HARD
     }
@@ -145,7 +145,7 @@ public class ClsGrid extends JPanel implements KeyListener {
     public ClsGrid() {
         int retryAttempts = 0;
         int maxRetries = 3;
-        while(true) {
+        while (true) {
             try {
                 LoadConfig();
                 InitSquares();
@@ -162,20 +162,25 @@ public class ClsGrid extends JPanel implements KeyListener {
 
                 setFocusable(true);
                 addKeyListener(this);
+
                 break;
+
             } catch (Exception e) {
                 System.err.println("An error occured while initializing the game");
                 System.err.println("Attempt " + Integer.toString(++retryAttempts) + " of " + Integer.toString(maxRetries));
                 if (retryAttempts == maxRetries) {
                     throw e;
-                }               
+                }
             }
         }
     }
-    
+
     public void ResetGame() {
         int retryAttempts = 0;
         int maxRetries = 3;
+
+        int tempRetries = 0;
+
         while (true) {
             try {
                 titleScreen = false;
@@ -188,11 +193,20 @@ public class ClsGrid extends JPanel implements KeyListener {
                 AddItems();
                 BuildCharacters(NUM_OF_BUNNIES, NUM_OF_BEARS);
                 UpdateDarkness(DARKNESS_RADIUS, null);
+
                 if (mylightsOn) {
                     LightEntireMap();
                 }
+
+//                boolean temp = false;
+//                if (temp) {
                 break;
-            } catch (Exception e){             
+//                }
+//
+//                tempRetries++;
+//                System.out.print(tempRetries);
+
+            } catch (Exception e) {
                 System.err.println("An error occured while resetting the game");
                 System.err.println("Attempt " + Integer.toString(++retryAttempts) + " of " + Integer.toString(maxRetries));
                 if (retryAttempts == maxRetries) {
@@ -226,7 +240,7 @@ public class ClsGrid extends JPanel implements KeyListener {
         if (titleScreen == true) {
             //Need to Move to UIDisplay
             g.drawString("Press a number to select a difficulty level", 350, 250);
-            g.drawString("1 = Easy", 350, 300 );
+            g.drawString("1 = Easy", 350, 300);
             g.drawString("2 = Normal", 350, 350);
             g.drawString("3 = Hard", 350, 400);
 
@@ -356,18 +370,30 @@ public class ClsGrid extends JPanel implements KeyListener {
         //Build user character
         double x = PAD + 7 * SQUARELEN;
         double y = PAD + 15 * SQUARELEN;
-        Rectangle2D.Double rect = new Rectangle.Double(x, y, SQUARELEN, SQUARELEN);
-        coord = walkCoord[RandomNumber(walkCoord.length)];
-        walkCoord = RemoveCoordFromArray(walkCoord, coord);
+        Rectangle2D.Double rect; //= new Rectangle.Double(x, y, SQUARELEN, SQUARELEN);
 
-        rect = new Rectangle2D.Double(PAD + coord.x * SQUARELEN, PAD + coord.y * SQUARELEN, SQUARELEN, SQUARELEN);
+        boolean validUserCharCoord = false;
+        do {
+            coord = walkCoord[RandomNumber(walkCoord.length)];
+            walkCoord = RemoveCoordFromArray(walkCoord, coord);
+            rect = new Rectangle2D.Double(PAD + coord.x * SQUARELEN, PAD + coord.y * SQUARELEN, SQUARELEN, SQUARELEN);
+
+            ClsNavigator navigator = new ClsNavigator(this);
+
+            //Any door will do. Since the houses and corner are all connected at this point
+            //This check should reduce the map build freezing a lot.
+            validUserCharCoord = navigator.IsRouteAvailable(coord, this.myHouses[0].getMyDoorCoord());
+
+        } while (!validUserCharCoord);
         this.myUserChar = new ClsUserCharacter(coord, rect, null, this); //?Matt? USER SPAWNING
 
         //Build bunnies and bears              
         ClsBunny[] bunnies = new ClsBunny[numberOfBunnies];
         boolean validBunnyLocation;
+        int placementAttempts = 0;
         for (int i = 0; i < numberOfBunnies; i++) {
             do {
+
                 coord = walkCoord[RandomNumber(walkCoord.length)];
 
                 ClsNavigator navigator = new ClsNavigator(this);
@@ -379,18 +405,26 @@ public class ClsGrid extends JPanel implements KeyListener {
                     }
                 }
 
+                placementAttempts++;
+                if (placementAttempts > 1000) {
+                    System.out.println("FAILED TO BUNNY PLACE");
+                }
+
             } while (!validBunnyLocation);
 
             walkCoord = RemoveCoordFromArray(walkCoord, coord);
             rect = new Rectangle2D.Double(PAD + coord.x * SQUARELEN, PAD + coord.y * SQUARELEN, SQUARELEN, SQUARELEN);
             bunnies[i] = new ClsBunny(new ClsCoordinate(coord.x, coord.y), rect, null, this);
         }
-        this.myBunnies = bunnies;                   
-                 
+        this.myBunnies = bunnies;
+        System.out.println("Built Bunnies");
+
         ClsBear[] bears = new ClsBear[numberOfBears];
         walkCoord = this.GetCoordinates(eTerrain.WALKABLE);
         coord = null;
         boolean canBearReachUser = false;
+
+        placementAttempts = 0;
 
         for (int i = 0; i < numberOfBears; i++) {
             do {
@@ -400,11 +434,17 @@ public class ClsGrid extends JPanel implements KeyListener {
                 bears[i] = new ClsBear(new ClsCoordinate(coord.x, coord.y), rect, null, this);
                 ClsNavigator navigator = new ClsNavigator(this);
                 canBearReachUser = navigator.IsRouteAvailable(this.myUserChar.GetCoord(), coord);
+
+                placementAttempts++;
+                if (placementAttempts > 1000) {
+                    System.out.println("FAILED TO BEAR PLACE");
+                }
+
             } while (!canBearReachUser || Point2D.distance(myUserChar.GetX(), myUserChar.GetY(), coord.x, coord.y) < BEAR_USER_SPAWN_DISTANCE);
             walkCoord = RemoveCoordFromArray(walkCoord, coord);
         }
         this.myBears = bears;
-
+        System.out.println("Built Bears");
     }
 
     private void AddItems() {
@@ -574,7 +614,10 @@ public class ClsGrid extends JPanel implements KeyListener {
                 this.myRiverCoordinates = ClsObstacle.BuildRiverCoordinates();
                 SetSquareType(this.myRiverCoordinates, ClsGrid.eTerrain.RIVER);
             }
+            System.out.println("Built River");
+
             SetHouseCoordinates();
+            System.out.println("Built Houses");
 
             for (int i = 0; i < ClsGrid.MAX_NUM_OF_OBSTACLES; i++) {
                 ClsCoordinate[] obstacleBlocked = AppendCoordArrays(GetCoordinates(eTerrain.RIVER), GetCoordinates(eTerrain.BLOCKED));
@@ -598,8 +641,9 @@ public class ClsGrid extends JPanel implements KeyListener {
                 BuildBridges(NUM_OF_BRIDGES);
             }
 
+            //TODO: Check for no dead end bridges
         } while (!IsMapValid());
-
+        System.out.println("Built Terrain");
     }
 
     private void BuildBridges(int numOfBridges) {
@@ -1271,7 +1315,7 @@ public class ClsGrid extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
 
-        if (titleScreen == true) {           
+        if (titleScreen == true) {
             if (e.getKeyCode() == KeyEvent.VK_NUMPAD1 || e.getKeyCode() == KeyEvent.VK_1) {
                 titleScreen = false;
                 playing = true;
@@ -1281,7 +1325,7 @@ public class ClsGrid extends JPanel implements KeyListener {
                 titleScreen = false;
                 playing = true;
                 DIFFICULTY = eDifficulty.NORMAL;
-                ResetGame();  
+                ResetGame();
             } else if (e.getKeyCode() == KeyEvent.VK_NUMPAD3 || e.getKeyCode() == KeyEvent.VK_3) {
                 titleScreen = false;
                 playing = true;
@@ -1330,6 +1374,14 @@ public class ClsGrid extends JPanel implements KeyListener {
                     LightEntireMap();
                 }
 
+            } else if (e.getKeyCode() == KeyEvent.VK_R) {
+                //Same code in IsUserDead() - Used for auto reset game.a
+                for (ClsSquare currSquare : this.squares) {
+                    currSquare.SetDarknessType(eDarkness.FULL);
+                }
+                myUserChar.IsDead(true);
+                playing = false;
+                gameOver = true;
             }
 
         } else if (gameOver == true) {

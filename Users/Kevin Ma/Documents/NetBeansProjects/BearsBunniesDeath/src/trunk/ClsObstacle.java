@@ -109,7 +109,7 @@ public class ClsObstacle {
                 lastSegmentDirection = ClsGrid.eDirection.NORTH;
             }
         }
-        OutputRiverCoordinates(myRiverCoordinates);
+//        OutputRiverCoordinates(myRiverCoordinates);
         return myRiverCoordinates;
     }
     
