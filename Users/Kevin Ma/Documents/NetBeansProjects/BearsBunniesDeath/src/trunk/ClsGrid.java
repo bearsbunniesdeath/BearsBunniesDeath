@@ -72,6 +72,11 @@ public class ClsGrid extends JPanel implements KeyListener {
 
     private int movesMade = 0;
     private int highScore = 0;
+
+    private int myEasyHighScore = 0;
+    private int myNormalHighScore = 0;
+    private int myHardHighScore = 0;
+
     public static eDifficulty DIFFICULTY = eDifficulty.NORMAL;
 
     private boolean titleScreen = true;
@@ -232,12 +237,18 @@ public class ClsGrid extends JPanel implements KeyListener {
 //            mySideBar = new ClsUIDisplay(2260, 618, width, height);
         }
 
+        Integer currDiffHighScore = 0;
+        if (DIFFICULTY == eDifficulty.EASY) {
+            currDiffHighScore = myEasyHighScore;
+        } else if (DIFFICULTY == eDifficulty.NORMAL) {
+            currDiffHighScore = myNormalHighScore;
+        } else if (DIFFICULTY == eDifficulty.HARD) {
+            currDiffHighScore = myHardHighScore;
+        }
         if (mySideBar != null) {
-            mySideBar.DrawSideBar(myPotentialPickups, myNumberOfPotentialPickupItems, myUserChar.GetItem(), myUserChar.GetItemToBeUsed(), g, movesMade, highScore, myIsItemActionAvailable);
+            mySideBar.DrawSideBar(myPotentialPickups, myNumberOfPotentialPickupItems, myUserChar.GetItem(), myUserChar.GetItemToBeUsed(), g, movesMade, currDiffHighScore, myIsItemActionAvailable, DIFFICULTY);
         }
 
-//        g.drawString("Number of moves: " + Integer.toString(movesMade), rightBorderOfPlayFieldInPixels, 450);
-//        g.drawString("High score: " + Integer.toString(highScore), rightBorderOfPlayFieldInPixels, 475);
         if (titleScreen == true) {
             //Need to Move to UIDisplay
             g.drawString("Press a number to select a difficulty level", 350, 250);
@@ -345,7 +356,7 @@ public class ClsGrid extends JPanel implements KeyListener {
                 this.SetSquareImage(bearTrap, g2);
             }
 
-            mySideBar.PaintGameOverScore(g, movesMade, highScore);
+            mySideBar.PaintGameOverScore(g, movesMade, currDiffHighScore);
         }
     }
 
@@ -488,7 +499,7 @@ public class ClsGrid extends JPanel implements KeyListener {
     private void AddTraps(int numberOfBearTraps) {
         double x = PAD + 7 * SQUARELEN;
         double y = PAD + 15 * SQUARELEN;
-        Rectangle2D.Double rect = new Rectangle.Double(x, y, SQUARELEN, SQUARELEN);
+        Rectangle2D.Double rect; // = new Rectangle.Double(x, y, SQUARELEN, SQUARELEN);
         ClsBearTrap[] bearTraps = new ClsBearTrap[numberOfBearTraps];
         ClsCoordinate[] walkCoord = this.GetCoordinates(eTerrain.WALKABLE);
         ClsCoordinate coord;
@@ -1084,14 +1095,18 @@ public class ClsGrid extends JPanel implements KeyListener {
     private void CheckForGameOver() {
         if (!IsUserDead()) {
             movesMade++;
-            System.out.println(movesMade);
+//            System.out.println(movesMade);
         } else {
-            if (movesMade > highScore) {
-                highScore = movesMade;
-
-//                movesMade = 0;
+            if (DIFFICULTY == eDifficulty.EASY && movesMade > myEasyHighScore) {
+                myEasyHighScore = movesMade;
+            } else if (DIFFICULTY == eDifficulty.NORMAL && movesMade > myNormalHighScore) {
+                myNormalHighScore = movesMade;
+            } else if (DIFFICULTY == eDifficulty.HARD && movesMade > myHardHighScore) {
+                myHardHighScore = movesMade;
             }
-            System.out.println("HIGH SCORE: " + highScore);
+            System.out.println("EASY HIGH SCORE: " + myEasyHighScore);
+            System.out.println("NORMAL HIGH SCORE: " + myNormalHighScore);
+            System.out.println("HARD HIGH SCORE: " + myHardHighScore);
         }
     }
 

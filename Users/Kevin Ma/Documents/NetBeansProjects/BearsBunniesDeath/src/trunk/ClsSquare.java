@@ -41,8 +41,8 @@ public class ClsSquare {
     }
 
     public void Draw(Graphics2D g2) {
-        g2.setColor(Color.BLACK);
-        g2.draw(rect);
+//        g2.setColor(Color.BLACK);
+//        g2.draw(rect);
     }
 
     public void Fill(Graphics2D g2) {       

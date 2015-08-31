@@ -67,7 +67,7 @@ public class ClsUIDisplay {
         g.drawString("Press space to restart.", myFullWidth / 2 + 50, myBottomPosition / 2 + 50);
     }
 
-    public void DrawSideBar(Boolean[] potentialItems, Integer numberOfItemsAvailible, ClsSquare userItem, ClsSquare userItemToUse, Graphics g, Integer currentScore, Integer highScore, boolean itemOptionAvailable) {
+    public void DrawSideBar(Boolean[] potentialItems, Integer numberOfItemsAvailible, ClsSquare userItem, ClsSquare userItemToUse, Graphics g, Integer currentScore, Integer highScore, boolean itemOptionAvailable, ClsGrid.eDifficulty difficulty) {
 
         this.DrawTemplate(g);
 
@@ -75,6 +75,7 @@ public class ClsUIDisplay {
         g.setColor(Color.black);
         g.drawString("Number of Moves: " + Integer.toString(currentScore), myPanelLeftPosition + TEXT_X_POSITION, TEXT_Y_POSITION);
         g.drawString("High Score: " + Integer.toString(highScore), myPanelLeftPosition + TEXT_X_POSITION, TEXT_Y_POSITION + 25);
+        g.drawString("Difficulty: " + (difficulty.toString()), myPanelLeftPosition + TEXT_X_POSITION, TEXT_Y_POSITION + 50);
 
         //Paint Item info
         if (userItem != null) {
