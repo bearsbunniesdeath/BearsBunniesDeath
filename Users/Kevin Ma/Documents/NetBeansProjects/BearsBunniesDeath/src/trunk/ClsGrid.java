@@ -15,7 +15,7 @@ import static trunk.ClsHelperUtils.*;
 
 /**
  *
- * @author Kevin Ma - TEST
+ * @author Kevin Ma
  */
 public class ClsGrid extends JPanel implements KeyListener {
 
@@ -82,13 +82,6 @@ public class ClsGrid extends JPanel implements KeyListener {
     private boolean titleScreen = true;
     private boolean playing = false;
     private boolean gameOver = false;
-
-    private void ChooseItem(int i) {
-        if (i == 0) {
-
-        }
-
-    }
 
     public static enum eDifficulty {
 
